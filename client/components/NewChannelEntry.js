@@ -14,7 +14,7 @@ class NewChannelEntry extends Component {
 
   handleSubmit (event) {
     event.preventDefault()
-    this.props.postChannel(this.state.channelName, this.props.history)
+    this.props.postChannel(this.state.channelName)
     this.setState({
       channelName: ''
     })
@@ -27,6 +27,7 @@ class NewChannelEntry extends Component {
   }
 
   render() {
+    console.log("HISTORY PROPS", this.props)
     return (
       <form onSubmit={this.handleSubmit}>
         <div className="form-group">
