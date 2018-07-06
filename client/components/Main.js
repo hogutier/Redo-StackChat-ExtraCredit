@@ -5,12 +5,13 @@ import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import MessagesList from './MessagesList';
 import NewChannelEntry from './NewChannelEntry';
-import store, { fetchMessages } from '../store';
+import store, { fetchMessages, fetchChannels } from '../store';
 
 class Main extends Component {
 
   componentDidMount () {
     this.props.fetchInitialMessages();
+    this.props.fetchChannels();
   }
 
   render () {
@@ -32,7 +33,8 @@ class Main extends Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    fetchInitialMessages: () => dispatch(fetchMessages())
+    fetchInitialMessages: () => dispatch(fetchMessages()),
+    fetchChannels: () => dispatch(fetchChannels())
   }
 }
 

@@ -10,7 +10,8 @@ import socket from './socket';
 const initialState = {
   messages: [],
   name: 'Reggie',
-  newMessageEntry: ''
+  newMessageEntry: '',
+  channels: []
 };
 
 // ACTION TYPES
@@ -19,8 +20,20 @@ const UPDATE_NAME = 'UPDATE_NAME';
 const GET_MESSAGE = 'GET_MESSAGE';
 const GET_MESSAGES = 'GET_MESSAGES';
 const WRITE_MESSAGE = 'WRITE_MESSAGE';
+const GET_CHANNELS = 'GET_CHANNELS';
+const RECEIVED_CHANNEL = 'RECEIVED_CHANNEL';
 
 // ACTION CREATORS
+
+export const receivedChannel = (channel) => ({
+  type: RECEIVED_CHANNEL,
+  channel
+})
+
+export const getChannels = (channels) => ({
+  type: GET_CHANNELS,
+  channels
+})
 
 export const updateName = (name) => {
   return { type: UPDATE_NAME, name };
@@ -56,6 +69,23 @@ export const postMessage = (message) => {
     const action = getMessage(newMessage);
     dispatch(action);
     socket.emit('new-message', newMessage);
+  }
+}
+
+export const fetchChannels = () => {
+  return async (dispatch) => {
+    const {data} = await axios.get('/api/channels')
+    dispatch(getChannels(data))
+  }
+}
+
+export const postChannel = (channel, history) => {
+  return async (dispatch) => {
+    const response = await axios.post('/api/channels', {name: channel})
+    const newChannel = response.data
+    dispatch(receivedChannel(newChannel))
+    socket.emit('new-channel', newChannel)
+    history.push(`/channels/${newChannel.id}`)
   }
 }
 
@@ -110,6 +140,18 @@ const reducer = (state = initialState, action) => {
         ...state,
         newMessageEntry: action.content
       };
+
+    case GET_CHANNELS:
+      return {
+        ...state,
+        channels: action.channels
+      }
+
+      case RECEIVED_CHANNEL:
+        return {
+          ...state,
+          channels: [...state.channels, action.channel]
+        }
 
     default:
       return state;
